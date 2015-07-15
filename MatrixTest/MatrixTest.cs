@@ -1,4 +1,5 @@
 ﻿using System;
+using MatrixNET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MatrixTest
@@ -7,8 +8,9 @@ namespace MatrixTest
     public class MatrixTest
     {
         [TestMethod]
-        public void ()
+        public void MultiplyByNumber()
         {
+
         }
     }
 }
