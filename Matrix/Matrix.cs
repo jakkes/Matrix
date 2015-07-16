@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace MatrixNET
 {
@@ -27,6 +23,55 @@ namespace MatrixNET
             _data = data;
         }
 
+        public string ToString()
+        {
+            string s = "";
+            for (int i = 0; i < Rows; i++)
+            {
+                for (int n = 0; n < Cols; n++)
+                {
+                    s += _data[i][n] + ",";
+                }
+                s += System.Environment.NewLine;
+            }
+            return s.Remove(s.Length - 1 - System.Environment.NewLine.Length);
+        }
+
+        public Matrix Transform()
+        {
+            var r = new Matrix(Cols, Rows);
+            for (int i = 0; i < Cols; i++)
+                for (int n = 0; n < Rows; n++)
+                    r._data[i][n] = _data[n][i];
+            return r;
+        }
+
+        public double Determinant()
+        {
+            if (Cols == 2)
+                return _data[0][0] * _data[1][1] - _data[0][1] * _data[1][0];
+            double v = 0;
+            for (int i = 0; i < Cols; i++)
+            {
+                var m = new Matrix(Rows - 1, Cols - 1);
+                for (int n = 1; n < Rows; n++)
+                {
+                    bool skipped = false;
+                    for (int a = 0; a < Cols; a++)
+                    {
+                        if (a == i)
+                        {
+                            skipped = true;
+                            continue;
+                        }
+                        m._data[n - 1][skipped ? a - 1 : a] = _data[n][a];
+                    }
+                }
+                v += _data[0][i] * System.Math.Pow(-1, i) * m.Determinant();
+            }
+            return v;
+        }
+
         public static Matrix operator +(Matrix one, Matrix two)
         {
             var r = new Matrix(one.Rows, one.Cols);
@@ -35,6 +80,19 @@ namespace MatrixNET
                 for (int n = 0; n < one.Cols; n++)
                 {
                     r._data[i][n] = one.Data[i][n] + two.Data[i][n];
+                }
+            }
+            return r;
+        }
+
+        public static Matrix operator -(Matrix one, Matrix two)
+        {
+            var r = new Matrix(one.Rows, one.Cols);
+            for (int i = 0; i < one.Rows; i++)
+            {
+                for (int n = 0; n < one.Cols; n++)
+                {
+                    r._data[i][n] = one.Data[i][n] - two.Data[i][n];
                 }
             }
             return r;
@@ -75,7 +133,7 @@ namespace MatrixNET
         {
             if (System.Object.ReferenceEquals(one, two))
                 return true;
-            else if ((object)one == null || (object)null == null)
+            else if ((object)one == null || (object)two == null)
                 return false;
             if (one.Rows != two.Rows || one.Cols != two.Cols)
                 return false;
@@ -90,6 +148,11 @@ namespace MatrixNET
             return true;
         }
 
+        public static bool operator !=(Matrix one, Matrix two)
+        {
+            return !(one == two);
+        }
+
         public static Matrix Parse(string values, int rows, int cols)
         {
             var t = values.Split(',');
@@ -99,10 +162,35 @@ namespace MatrixNET
                 d[i] = new double[cols];
                 for (int n = 0; n < cols; n++)
                 {
-                    d[i][n] = double.Parse(t[(i + 1) * n]);
+                    d[i][n] = double.Parse(t[i * cols + n]);
                 }
             }
             return new Matrix(d);
+        }
+
+        public static Matrix Identity(int size)
+        {
+            string s = "";
+            for (int i = 0; i < size; i++)
+            {
+                for (int n = 0; n < size; n++)
+                {
+                    if (n == i)
+                        s += "1,";
+                    else s += "0,";
+                }
+            }
+            return Matrix.Parse(s.Remove(s.Length - 1), size, size);
+        }
+
+        public static Matrix Transform(Matrix mat)
+        {
+            return mat.Transform();
+        }
+
+        public static double Det(Matrix mat)
+        {
+            return mat.Determinant();
         }
     }
 }
