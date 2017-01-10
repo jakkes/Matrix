@@ -8,6 +8,7 @@ namespace MatrixNET
         public int Rows { get { return _data.Length; } }
         public int Cols { get { return _data[0].Length; } }
         public double[][] Data { get { return _data; } }
+        
 
         private double[][] _data;
 
@@ -23,7 +24,7 @@ namespace MatrixNET
             _data = data;
         }
 
-        public string ToString()
+        public override string ToString()
         {
             string s = "";
             for (int i = 0; i < Rows; i++)
@@ -70,6 +71,18 @@ namespace MatrixNET
                 v += _data[0][i] * System.Math.Pow(-1, i) * m.Determinant();
             }
             return v;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() == typeof(Matrix))
+                return (Matrix)obj == this;
+            return base.Equals(obj); 
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
 
         public static Matrix operator +(Matrix one, Matrix two)
@@ -129,9 +142,14 @@ namespace MatrixNET
             return r;
         }
 
+        public static Matrix operator *(double one, Matrix two)
+        {
+            return two * one;
+        }
+
         public static bool operator ==(Matrix one, Matrix two)
         {
-            if (System.Object.ReferenceEquals(one, two))
+            if (ReferenceEquals(one, two))
                 return true;
             else if ((object)one == null || (object)two == null)
                 return false;
@@ -155,7 +173,7 @@ namespace MatrixNET
 
         public static Matrix Parse(string values, int rows, int cols)
         {
-            var t = values.Split(',');
+            var t = values.Split(' ');
             var d = new double[rows][];
             for (int i = 0; i < rows; i++)
             {
